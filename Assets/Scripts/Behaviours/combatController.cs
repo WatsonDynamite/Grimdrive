@@ -110,8 +110,9 @@ public class combatController : MonoBehaviour {
              //TEMP: This list will later be loaded from a team file for P1 / the server for P2
             string fieryAddr = "Assets/Scriptables/Monsters/Fiery.asset";
             string wateryAddr = "Assets/Scriptables/Monsters/Watery.asset";
-            string[] p1 = {fieryAddr, wateryAddr, "", "", "", ""};
-            string[] p2 = {wateryAddr, fieryAddr, "", "", "", ""};
+            string speaktreAddr = "Assets/Scriptables/Monsters/Speaktre.asset";
+            string[] p1 = {fieryAddr, wateryAddr, speaktreAddr, "", "", ""};
+            string[] p2 = {speaktreAddr, wateryAddr, fieryAddr, "", "", ""};
 
             yield return StartCoroutine(GeneratePlayer1Party(p1));
             yield return StartCoroutine(GeneratePlayer2Party(p2));

@@ -58,6 +58,7 @@
      <Compile Include="Assets\Scripts\Data\Stats\StatModifier.cs" />
      <Compile Include="Assets\Scripts\Data\TurnAction.cs" />
      <Compile Include="Assets\Scripts\Data\Monsters\LoadP1MovesDynamic.cs" />
+     <None Include="Assets\Materials\psx-vertexlit-cutoff.shader" />
     <Reference Include="UnityEngine">
         <HintPath>D:/Program Files/Unity/2020.2.7f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

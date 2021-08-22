@@ -119,6 +119,12 @@ MonoBehaviour:
     m_SerializedLabels: []
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
+  - m_GUID: f3eaf29f3a2c26b49a5de0722101a445
+    m_Address: Assets/Scriptables/Monsters/Speaktre.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: b8566679ae484e74ebf4a11db92a76f2, type: 2}
   m_SchemaSet:

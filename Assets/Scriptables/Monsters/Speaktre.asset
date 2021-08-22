@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b7716f1313ac1a48a184a3317f6146a, type: 3}
+  m_Name: Speaktre
+  m_EditorClassIdentifier: 
+  name: Speaktre
+  type1: 7
+  type2: 0
+  HP: 100
+  ATK: 90
+  DEF: 60
+  spATK: 80
+  spDEF: 80
+  SPEED: 90
+  move1: {fileID: 11400000, guid: fe01bdc40ca68664a88881b77f1c7c8a, type: 2}
+  move2: {fileID: 11400000, guid: 221d0a4b183acf548b371ca864ee86aa, type: 2}
+  move3: {fileID: 11400000, guid: 2806e95b67110bf449864aa28c9f173f, type: 2}
+  move4: {fileID: 11400000, guid: 92695f4403080394ab3158bdf4ee731b, type: 2}
+  prefab: {fileID: 4540652850084616937, guid: cfac947737db9b6459ac538200dd70c9, type: 3}

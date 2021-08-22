@@ -254,6 +254,7 @@ MonoBehaviour:
   StatusEffectTurnCounterP2: {fileID: 223227656}
   monsterList: {fileID: 1849494701}
   isTurnInProgress: 0
+  hasTurnBeenBroken: 0
   reloadUI: 0
 --- !u!4 &32620763
 Transform:
