@@ -98,7 +98,7 @@ public class LoadP1MonstersDynamic : MonoBehaviour
             Move enemyMove = enemyMoveList[Random.Range(0, enemyMoveList.Count - 1)];
 
 
-            StartCoroutine(combatController.ExecuteTurn(playerAction, new TurnAction(enemyMove, combatController.player2Monster, combatController.player1Monster)));
+            StartCoroutine(combatController.ExecuteTurn(playerAction, new TurnAction(enemyMove, combatController.player2Monster, combatController.player1Slot1)));
            
         }
         ToggleMonsterList();
@@ -147,46 +147,5 @@ public class LoadP1MonstersDynamic : MonoBehaviour
             SwitchButtonText.GetComponentInChildren<Text>().text = "Switch";
         }
     }
-
-    /* I think this code is in the LoadP1MovesDynamic file now.
-    -
-    public void EnableMoveToolTip(GameObject btn)
-    {
-        Move move = MoveList.moveNone;
-        ToolTipSnapToCursor();
-        MoveToolTip.SetActive(true);
-        if (btn == AtkBtn1)
-        {
-            move = moveList[0];
-        }
-        else if (btn == AtkBtn2)
-        {
-            move = moveList[1];
-        }
-        else if (btn == AtkBtn3)
-        {
-            move = moveList[2];
-        }
-        else if (btn == AtkBtn4)
-        {
-            move = moveList[3];
-        }
-        MoveToolTip.transform.Find("Txt_Name").GetComponent<Text>().text = move.name;
-        MoveToolTip.transform.Find("Txt_Description").GetComponent<Text>().text = move.desc;
-        MoveToolTip.transform.Find("Txt_Cost").GetComponent<Text>().text = move.cost.ToString();
-        MoveToolTip.transform.Find("Txt_Power").GetComponent<Text>().text = move.power.ToString() == "0" ? "--" : move.power.ToString();
-        MoveToolTip.transform.Find("Image").GetComponent<Image>().sprite = categsprites[(int)move.cat];
-    }
-
-    public void DisableMonsterToolTip()
-    {
-        MibsrerToolTip.SetActive(false);
-    }
-
-    public void ToolTipSnapToCursor()
-    {
-        MoveToolTip.transform.position = new Vector3(Input.mousePosition.x + 6, Input.mousePosition.y + 6, Input.mousePosition.z);
-    }
-    */
 
 }

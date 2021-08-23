@@ -25,4 +25,4 @@ MonoBehaviour:
   move2: {fileID: 11400000, guid: 221d0a4b183acf548b371ca864ee86aa, type: 2}
   move3: {fileID: 11400000, guid: 2806e95b67110bf449864aa28c9f173f, type: 2}
   move4: {fileID: 11400000, guid: 92695f4403080394ab3158bdf4ee731b, type: 2}
-  prefab: {fileID: 4540652850084616937, guid: cfac947737db9b6459ac538200dd70c9, type: 3}
+  prefab: {fileID: 4394777046912510716, guid: 846077a155c90a54885563d65d23bc23, type: 3}

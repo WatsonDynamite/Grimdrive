@@ -53,7 +53,7 @@ public class LoadP1MovesDynamic : MonoBehaviour
         {
             button.GetComponent<Button>().onClick.RemoveAllListeners();
             Move mv = moveList[i];
-            TurnAction playerAction = new TurnAction(mv, combatController.player1Monster, combatController.player2Monster);
+            TurnAction playerAction = new TurnAction(mv, combatController.player1Monster, combatController.player2Slot1);
             button.GetComponentInChildren<Text>().text = mv.name;
             button.GetComponentsInChildren<Image>()[1].sprite = TypeUtils.spriteByType(mv.type);
             button.GetComponent<Button>().onClick.AddListener(delegate { turnQueuer(playerAction); });
@@ -67,7 +67,7 @@ public class LoadP1MovesDynamic : MonoBehaviour
         //the following 3 lines are to be replaced whenever we get any netcode
         List<Move> enemyMoveList = combatController.getP2Moves();
         Move enemyMove = enemyMoveList[Random.Range(0, enemyMoveList.Count - 1)];
-        StartCoroutine(combatController.ExecuteTurn(playerAction, new TurnAction(enemyMove, combatController.player2Monster, combatController.player1Monster)));
+        StartCoroutine(combatController.ExecuteTurn(playerAction, new TurnAction(enemyMove, combatController.player2Monster, combatController.player1Slot1)));
         ToggleMoveList();
     }
 

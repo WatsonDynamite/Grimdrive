@@ -18,12 +18,12 @@ public class TurnAction
     public ActionType actionType{get;}
     public Move move{get;}
     public Monster user{get;}
-    public Monster target{get;} 
+    public Slot target{get;} 
     public Monster switchMonster{get;}
     public int priority{get;}
 
-        //Turn action for performing a move. mv is the move to be used, user is the using monster and target is the opponent.
-    public TurnAction(Move mv, Monster usr, Monster trg){
+        //Turn action for performing a move. mv is the move to be used, user is the using monster and target is the opponent (a Slot, not a monster).
+    public TurnAction(Move mv, Monster usr, Slot trg){
             actionType = ActionType.MOVE;
             move = mv;
             user = usr;

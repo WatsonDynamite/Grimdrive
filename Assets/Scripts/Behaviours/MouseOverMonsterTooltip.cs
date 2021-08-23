@@ -45,19 +45,19 @@ public class MouseOverMonsterTooltip : MonoBehaviour
             }else{
             monster1ToolTip.transform.Find("Img_type2").GetComponent<Image>().sprite = TypeUtils.spriteByType(combatController.player1Monster.type2);
             }
-            monster1ToolTip.transform.Find("TextName").GetComponent<Text>().text =    combatController.player1Monster.name;
+            monster1ToolTip.transform.Find("TextName").GetComponent<Text>().text = combatController.player1Monster.name;
             monster1ToolTip.transform.Find("TextHP").GetComponent<Text>().text =    combatController.player1Monster.HP.value.ToString();
                 SetStatBarLength(monster1ToolTip.transform.Find("HPStatMeter").GetComponent<Image>(), combatController.player1Monster.HP.value);
             monster1ToolTip.transform.Find("TextAtk").GetComponent<Text>().text =   combatController.player1Monster.ATK.value.ToString();
-                SetStatBarLength(monster1ToolTip.transform.Find("AtkStatMeter").GetComponent<Image>(), combatController.player1Monster.HP.value);
+                SetStatBarLength(monster1ToolTip.transform.Find("AtkStatMeter").GetComponent<Image>(), combatController.player1Monster.ATK.value);
             monster1ToolTip.transform.Find("TextDef").GetComponent<Text>().text =   combatController.player1Monster.DEF.value.ToString();
-                SetStatBarLength(monster1ToolTip.transform.Find("DefStatMeter").GetComponent<Image>(), combatController.player1Monster.HP.value);
+                SetStatBarLength(monster1ToolTip.transform.Find("DefStatMeter").GetComponent<Image>(), combatController.player1Monster.DEF.value);
             monster1ToolTip.transform.Find("TextSpAtk").GetComponent<Text>().text = combatController.player1Monster.spATK.value.ToString();
-                SetStatBarLength(monster1ToolTip.transform.Find("SpAtkStatMeter").GetComponent<Image>(), combatController.player1Monster.HP.value);
+                SetStatBarLength(monster1ToolTip.transform.Find("SpAtkStatMeter").GetComponent<Image>(), combatController.player1Monster.spATK.value);
             monster1ToolTip.transform.Find("TextSpDef").GetComponent<Text>().text = combatController.player1Monster.spDEF.value.ToString();
-                SetStatBarLength(monster1ToolTip.transform.Find("SpDefStatMeter").GetComponent<Image>(), combatController.player1Monster.HP.value);
+                SetStatBarLength(monster1ToolTip.transform.Find("SpDefStatMeter").GetComponent<Image>(), combatController.player1Monster.spDEF.value);
             monster1ToolTip.transform.Find("TextSpe").GetComponent<Text>().text =   combatController.player1Monster.SPEED.value.ToString();
-                SetStatBarLength(monster1ToolTip.transform.Find("SpeStatMeter").GetComponent<Image>(), combatController.player1Monster.HP.value);    
+                SetStatBarLength(monster1ToolTip.transform.Find("SpeStatMeter").GetComponent<Image>(), combatController.player1Monster.SPEED.value);    
 
         }else if(HPPlate == HPP2){
             monster2ToolTip.SetActive(true);
@@ -71,15 +71,15 @@ public class MouseOverMonsterTooltip : MonoBehaviour
             monster2ToolTip.transform.Find("TextHP").GetComponent<Text>().text =    combatController.player2Monster.HP.value.ToString();
                 SetStatBarLength(monster2ToolTip.transform.Find("HPStatMeter").GetComponent<Image>(), combatController.player2Monster.HP.value);
             monster2ToolTip.transform.Find("TextAtk").GetComponent<Text>().text =   combatController.player2Monster.ATK.value.ToString();
-                SetStatBarLength(monster2ToolTip.transform.Find("AtkStatMeter").GetComponent<Image>(), combatController.player2Monster.HP.value);
+                SetStatBarLength(monster2ToolTip.transform.Find("AtkStatMeter").GetComponent<Image>(),  combatController.player2Monster.ATK.value);
             monster2ToolTip.transform.Find("TextDef").GetComponent<Text>().text =   combatController.player2Monster.DEF.value.ToString();
-                SetStatBarLength(monster2ToolTip.transform.Find("DefStatMeter").GetComponent<Image>(), combatController.player2Monster.HP.value);
+                SetStatBarLength(monster2ToolTip.transform.Find("DefStatMeter").GetComponent<Image>(), combatController.player2Monster.DEF.value);
             monster2ToolTip.transform.Find("TextSpAtk").GetComponent<Text>().text = combatController.player2Monster.spATK.value.ToString();
-                SetStatBarLength(monster2ToolTip.transform.Find("SpAtkStatMeter").GetComponent<Image>(), combatController.player2Monster.HP.value);
+                SetStatBarLength(monster2ToolTip.transform.Find("SpAtkStatMeter").GetComponent<Image>(), combatController.player2Monster.spATK.value);
             monster2ToolTip.transform.Find("TextSpDef").GetComponent<Text>().text = combatController.player2Monster.spDEF.value.ToString();
-                SetStatBarLength(monster2ToolTip.transform.Find("SpDefStatMeter").GetComponent<Image>(), combatController.player2Monster.HP.value);
+                SetStatBarLength(monster2ToolTip.transform.Find("SpDefStatMeter").GetComponent<Image>(), combatController.player2Monster.spDEF.value);
             monster2ToolTip.transform.Find("TextSpe").GetComponent<Text>().text =   combatController.player2Monster.SPEED.value.ToString();
-                SetStatBarLength(monster2ToolTip.transform.Find("SpeStatMeter").GetComponent<Image>(), combatController.player2Monster.HP.value); 
+                SetStatBarLength(monster2ToolTip.transform.Find("SpeStatMeter").GetComponent<Image>(), combatController.player2Monster.SPEED.value); 
         }
     }
 
@@ -138,9 +138,6 @@ public class MouseOverMonsterTooltip : MonoBehaviour
         switchMonsterToolTip.SetActive(false);
         UnsetStatBarLength(monster1ToolTip.transform.Find("HPStatMeter").GetComponent<Image>());
     }
-
-
-
 
     public void ToolTipSnapToCursor(GameObject HPPlate){
       //  moveToolTip.transform.position = new Vector3(Input.mousePosition.x + 6, Input.mousePosition.y + 6, Input.mousePosition.z);

@@ -34,9 +34,17 @@ public class combatController : MonoBehaviour {
         public List<Monster> player1Party; //list of Player 1's available monsters
         public List<Monster> player2Party; //same but for player 2
 
-        [SerializeField]
+        
+        [Header ("Aether Points")]
+        public int player1AP = 12;
+        public int player2AP = 12;
+
         [Header ("Player 1 Monster")]
+
+        [SerializeField]
         public Monster player1Monster; //player 1's current active monster
+        
+        [SerializeField]
         public Monster player2Monster; //you know the drill
 
         //these are the models that are loaded on the scene
@@ -90,8 +98,11 @@ public class combatController : MonoBehaviour {
         public bool reloadUI = false;  //reloads the UI when set to true
 
         private List<IEnumerator> seq; //this is the sequence of animations and actions for a given turn. This needs to be constructed and then executed
-        private float damageCalcConstant = 0.6f; //this is the constant for the damage formula.
+        private float damageCalcConstant = 0.5f; //this is the constant for the damage formula.
 
+        public Slot player1Slot1 {get; set;}
+
+        public Slot player2Slot1 {get; set;}
 
         //these are the delegates for the different animations. Delegates are essentially variables that store functions. Very useful to avoid code repetitions.
         delegate IEnumerator AtkAnim (Move move, int dmg);
@@ -101,6 +112,7 @@ public class combatController : MonoBehaviour {
         delegate IEnumerator SwitchAnim ();
 
         IEnumerator Start () {
+            WriteToLog("--- MATCH START ---");
             turnCounter = 1;
             isTurnInProgress = false;
 
@@ -121,6 +133,11 @@ public class combatController : MonoBehaviour {
             GameObject switchButton = GameObject.Find("SwitchButton");
             LoadP1MovesDynamic moveScript = fightButton.GetComponentInChildren<LoadP1MovesDynamic>();
             LoadP1MonstersDynamic monsterScript = switchButton.GetComponentInChildren<LoadP1MonstersDynamic>();
+
+            //set monsters to slots (for move targeting)
+            player1Slot1 = new Slot(player1Monster, "player1slot1");
+            player2Slot1 = new Slot(player2Monster, "player2slot1");
+
             //fill UI
             moveScript.LoadMovesIntoUI();
             monsterScript.LoadMonstersIntoUI();
@@ -235,41 +252,23 @@ public class combatController : MonoBehaviour {
                         seq.Add (DoMoves (act.move, act.user, act.target));
                         break;
                     case (ActionType.SWITCH):
-                        Debug.Log(act.user.name);
                         seq.Add (SwapMon (act.user, act.switchMonster));
                         break;
                 }
             }
 
             isTurnInProgress = true;
+            
             foreach (var item in seq) {
-                if (player1Monster == null || player2Monster == null) {
-                    Debug.Log("Broke off Turn");
-                    hasTurnBeenBroken = true;
-                }
+                //checks if the monster that is about to act is dead, and stops that action from happening
                 if(!hasTurnBeenBroken) {
-                     yield return item;
-                     //checks if the monster that is about to act is dead, and stops that action from happening
+                    yield return item;
                     Debug.Log("Executed Turn" + turnCounter);
-                }                
+                }
             }
+
             yield return SequenceStatusEffects();
-            if(hasTurnBeenBroken) {
-                List<Monster> auxList = new List<Monster> ();
-                //obtain every non-dead monster from the party
-                foreach (Monster mon in player1Party) {
-                    if (!(mon.Compare (MonsterList.monsterNone)) && mon.currentHP != 0) {
-                        auxList.Add (mon);
-                    }
-                }
-                if (auxList.Count == 1){ 
-                    yield return SummonNewMon(auxList[0], 1);
-                } else if(auxList.Count > 0) {
-                    yield return ShowNewMonsterSelector();
-                } else {
-                    SceneManager.LoadScene("TitleScreen");
-                }
-            }
+
             isTurnInProgress = false;
             turnCounter++;
             yield break;
@@ -357,7 +356,8 @@ public class combatController : MonoBehaviour {
                 reloadUI = true;
                 GameObject camr = P1Cam;
                 SwitchAnim SwitchAnimDel = new SwitchAnim (PlayBuffAnimP1);
-                float animationTime = 1f;
+                
+                var animator = (player1MonsterInstance).GetComponent<Animator>();
 
                 //set up which monster we're switching
                 if (ReferenceEquals (current, player1Monster)) {
@@ -377,6 +377,8 @@ public class combatController : MonoBehaviour {
                 cameraController.SetActive (false); //stops the automatic camera swaps
                 camr.SetActive (true); //changes the view to the static camera
                 yield return SwitchAnimDel (); //play animation
+                var state = animator.GetCurrentAnimatorStateInfo(0);
+                yield return new WaitForSeconds (state.length + state.normalizedTime);
 
                 //this should be changed for the sake of no code repetition
                 //also, player 2 can't switch yet, so that "else" block is horribly incomplete.
@@ -384,16 +386,21 @@ public class combatController : MonoBehaviour {
                     player1Monster = null;
                     Destroy (player1MonsterInstance);
                     player1Monster = newMon;
+                    player1Slot1.SetMonster(newMon);
                     player1MonsterInstance = Instantiate (player1Monster.model as GameObject, player1Spawn.transform.position, player1Spawn.transform.rotation);
                 } else {
                     player2Monster = null;
                     player2Monster = newMon;
+                    player2Slot1.SetMonster(newMon);
                 }
 
+                var newMonAnimator = (player1MonsterInstance).GetComponent<Animator>();
+                var newState = newMonAnimator.GetCurrentAnimatorStateInfo(0);
                
                 yield return SwitchAnimDel ();  //plays the sending out animation (right now it's the same as the switch out animation)
                 LoadHPPlates (); //reloads the HP plates
-                yield return new WaitForSeconds (animationTime);
+                yield return new WaitForSeconds (state.length + state.normalizedTime + 1f);
+                
 
                 //resets cameras
                 camr.SetActive (false);
@@ -430,11 +437,13 @@ public class combatController : MonoBehaviour {
                 switch (player) {
                     case 1:
                         player1Monster = newMon;
+                        player1Slot1.SetMonster(newMon);
                         player1MonsterInstance = Instantiate (player1Monster.model as GameObject, player1Spawn.transform.position, player1Spawn.transform.rotation);
                         break;
 
                     case 2:
                         player2Monster = newMon;
+                        player2Slot1.SetMonster(newMon);
                         player2MonsterInstance = Instantiate (player2Monster.model as GameObject, player2Spawn.transform.position, player2Spawn.transform.rotation);
                         break;
                 }
@@ -449,8 +458,9 @@ public class combatController : MonoBehaviour {
                 isTurnInProgress = false;
             }
 
-            public IEnumerator DoMoves (Move move, Monster attacker, Monster defender) { //execute turn if both monsters are attacking
+            public IEnumerator DoMoves (Move move, Monster attacker, Slot defenderSlot) { //execute turn if both monsters are attacking
                 if (attacker != null) {
+                    var defender = defenderSlot.monsterInSlot;
                     WriteToLog (attacker.name + " used " + move.name + "!");
 
                     var isSTAB = false;
@@ -538,6 +548,8 @@ public class combatController : MonoBehaviour {
                         yield return FaintAnimDel2nd ();
                         //turn is over
                         isTurnInProgress = false;
+                        hasTurnBeenBroken = true;
+                        StartCoroutine (CameraStateRestore ());
                         yield break;
                     }
 
@@ -627,7 +639,7 @@ public class combatController : MonoBehaviour {
                         }
                         break;
                 }
-                yield return new WaitForSeconds (0);
+                yield break;
             }
 
             public void EnableStatusEffectIndicator(Monster monster) {
@@ -686,7 +698,7 @@ public class combatController : MonoBehaviour {
 
             public void WriteToLog (string str) {
                 logText.GetComponentInChildren<Text> ().text += (str + "\n");
-                scrollRect.GetComponentInChildren<ScrollRect> ().normalizedPosition = new Vector2 (0, 0);
+                scrollRect.GetComponentInChildren<ScrollRect> ().verticalNormalizedPosition = 0f;
             }
 
             //REFRESH UI ELEMENTS
@@ -792,24 +804,47 @@ public class combatController : MonoBehaviour {
             public IEnumerator PlayFaintAnimP1 () {
                 cameraController.SetActive (false);
                 P1Cam.SetActive (true);
-                if ((player1MonsterInstance).GetComponent<Animator> () != null) {
-                    (player1MonsterInstance).GetComponent<Animator> ().SetBool ("Die", true);
+                var animator = (player1MonsterInstance).GetComponent<Animator>();
+                if (animator != null) {
+                    animator.SetBool ("Die", true);
                 }
-                yield return new WaitForSeconds (1);
+                var state = animator.GetCurrentAnimatorStateInfo(0);
+
+                yield return new WaitForSeconds (state.length + state.normalizedTime);
                 Destroy (player1MonsterInstance);
                 DisableStatusEffectIndicator(player1Monster);
                 player1Monster = null;
+
+
                 //present monster GUI
+                List<Monster> auxList = new List<Monster> ();
+                //obtain every non-dead monster from the party
+                foreach (Monster mon in player1Party) {
+                    if (!(mon.Compare (MonsterList.monsterNone)) && mon.currentHP != 0) {
+                        auxList.Add (mon);
+                    }
+                }
+                if (auxList.Count == 1){ 
+                    yield return SummonNewMon(auxList[0], 1);
+                } else if(auxList.Count > 0) {
+                    yield return ShowNewMonsterSelector();
+                } else {
+                    SceneManager.LoadScene("TitleScreen");
+                }
+
                 LoadMonsterScoreBoards ();
             }
 
             public IEnumerator PlayFaintAnimP2 () {
                 cameraController.SetActive (false);
                 P2Cam.SetActive (true);
-                if ((player2MonsterInstance).GetComponent<Animator> () != null) {
-                    (player2MonsterInstance).GetComponent<Animator> ().SetBool ("Die", true);
+                var animator = (player2MonsterInstance).GetComponent<Animator>();
+                if (animator != null) {
+                    animator.SetBool ("Die", true);
                 }
-                yield return new WaitForSeconds (1);
+                var state = animator.GetCurrentAnimatorStateInfo(0);
+
+                yield return new WaitForSeconds (state.length + state.normalizedTime);
                 Destroy (player2MonsterInstance);
                 DisableStatusEffectIndicator(player2Monster);
                 player2Monster = null;
@@ -955,7 +990,7 @@ public class combatController : MonoBehaviour {
                 P1Cam.SetActive (false);
                 P2Cam.SetActive (false);
                 cameraController.SetActive (true);
-                yield return new WaitForSeconds (0);
+                yield break;
             }
 
             //pause attack animation (testing)
