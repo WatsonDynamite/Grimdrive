@@ -51,24 +51,23 @@ public class LoadP1MovesDynamic : MonoBehaviour
         int i = 0;
         foreach (GameObject button in buttons)
         {
-            button.GetComponent<Button>().onClick.RemoveAllListeners();
+            var ButtonComponent = button.GetComponent<Button>();
+            ButtonComponent.onClick.RemoveAllListeners();
             Move mv = moveList[i];
             TurnAction playerAction = new TurnAction(mv, combatController.player1Monster, combatController.player2Slot1);
             button.GetComponentInChildren<Text>().text = mv.name;
             button.GetComponentsInChildren<Image>()[1].sprite = TypeUtils.spriteByType(mv.type);
-            button.GetComponent<Button>().onClick.AddListener(delegate { turnQueuer(playerAction); });
-            button.GetComponent<Button>().onClick.AddListener(delegate { DisableMoveToolTip(); });
+            ButtonComponent.onClick.AddListener(delegate { turnQueuer(playerAction); });
+            ButtonComponent.onClick.AddListener(delegate { DisableMoveToolTip(); });
+            ButtonComponent.interactable = (combatController.player1AP >= mv.cost);
             i++;
         }
     }
 
-    private void turnQueuer(TurnAction playerAction){ //this gets both moves from each monster and begins the turn
-        //player 2 (CPU) picks a move at random
-        //the following 3 lines are to be replaced whenever we get any netcode
-        List<Move> enemyMoveList = combatController.getP2Moves();
-        Move enemyMove = enemyMoveList[Random.Range(0, enemyMoveList.Count - 1)];
-        StartCoroutine(combatController.ExecuteTurn(playerAction, new TurnAction(enemyMove, combatController.player2Monster, combatController.player1Slot1)));
-        ToggleMoveList();
+    private void turnQueuer(TurnAction playerAction)
+    { 
+        combatController.TurnQueuer(playerAction);
+        DisableMoveList();
     }
 
     // Update is called once per frame

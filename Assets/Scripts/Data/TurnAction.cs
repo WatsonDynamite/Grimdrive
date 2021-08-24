@@ -22,7 +22,7 @@ public class TurnAction
     public Monster switchMonster{get;}
     public int priority{get;}
 
-        //Turn action for performing a move. mv is the move to be used, user is the using monster and target is the opponent (a Slot, not a monster).
+    //Turn action for performing a move. mv is the move to be used, user is the using monster and target is the opponent (a Slot, not a monster).
     public TurnAction(Move mv, Monster usr, Slot trg){
             actionType = ActionType.MOVE;
             move = mv;
@@ -31,12 +31,12 @@ public class TurnAction
             priority = mv.priority;
     }
 
-    public TurnAction(ActionType at){
-            actionType = at;
-            move = MoveList.moveNone;
+    public TurnAction(Monster usr){
+            actionType = ActionType.REST;
+            user = usr;
     }
 
-        //Turn action for switching. mn is the monster to switch to. user is the monster that's being switched out.
+    //Turn action for switching. mn is the monster to switch to. user is the monster that's being switched out.
     public TurnAction(Monster mn,  Monster usr){
             actionType = ActionType.SWITCH;
             user = usr;

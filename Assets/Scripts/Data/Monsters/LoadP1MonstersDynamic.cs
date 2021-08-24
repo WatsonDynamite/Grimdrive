@@ -13,6 +13,7 @@ public class LoadP1MonstersDynamic : MonoBehaviour
     //UI BUTTONS
     [Header("UI Buttons")]
     public GameObject SwitchButtonText;
+    public GameObject RestButton;
     public GameObject MonBtnList;
     public GameObject MonBtn1;
     public GameObject MonBtn2;
@@ -35,10 +36,8 @@ public class LoadP1MonstersDynamic : MonoBehaviour
 
     // Start is called before the first frame update
     void Start(){}
-
     public void LoadMonstersIntoUI()
     {
-
         //in here we get the monsters from the player's party and make the buttons match them.
         //We add a listener to each button
         party = combatController.getP1Party();
@@ -82,26 +81,14 @@ public class LoadP1MonstersDynamic : MonoBehaviour
 
     }
 
+    public void onRestButtonClick() {
+       turnQueuer(new TurnAction(combatController.player1Monster));
+    }
+
     private void turnQueuer(TurnAction playerAction)
     {
-        //check if the player is swapping an existing monster or sending out a new one
-        if(combatController.player1Monster == null)
-        {
-            LoadMonstersIntoUI();
-            StartCoroutine(combatController.SummonNewMon(playerAction.switchMonster, 1));
-        }
-        else
-        {
-            //this gets both moves from each monster and begins the turn
-            //the next 3 lines of code are to be replaced whenever netcode is implemented.
-            List<Move> enemyMoveList = combatController.getP2Moves();
-            Move enemyMove = enemyMoveList[Random.Range(0, enemyMoveList.Count - 1)];
-
-
-            StartCoroutine(combatController.ExecuteTurn(playerAction, new TurnAction(enemyMove, combatController.player2Monster, combatController.player1Slot1)));
-           
-        }
-        ToggleMonsterList();
+        combatController.TurnQueuer(playerAction);
+        DisableMonsterList();
     }
 
     // Update is called once per frame
@@ -113,8 +100,10 @@ public class LoadP1MonstersDynamic : MonoBehaviour
             
         if(combatController.isTurnInProgress){
             GetComponent<Button>().interactable = false;
+            RestButton.GetComponent<Button>().interactable = false;
         }else{
             GetComponent<Button>().interactable = true;
+            RestButton.GetComponent<Button>().interactable = true;
         }
     }
 

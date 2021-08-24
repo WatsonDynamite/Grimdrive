@@ -34,7 +34,6 @@ public class combatController : MonoBehaviour {
         public List<Monster> player1Party; //list of Player 1's available monsters
         public List<Monster> player2Party; //same but for player 2
 
-        
         [Header ("Aether Points")]
         public int player1AP = 12;
         public int player2AP = 12;
@@ -59,11 +58,12 @@ public class combatController : MonoBehaviour {
         public GameObject P1HPText;
         public GameObject P1HPMeter;
         public GameObject MonstersLeftP1;
-
         public GameObject P2MonsterName;
         public GameObject P2HPText;
         public GameObject P2HPMeter;
         public GameObject MonstersLeftP2;
+        public GameObject APMeterP1;
+        public GameObject APMeterP2;
 
         // the Final Fantasy / Digimon style move name that shows up when a monster moves.
         public GameObject moveNamePlate;
@@ -141,6 +141,7 @@ public class combatController : MonoBehaviour {
             //fill UI
             moveScript.LoadMovesIntoUI();
             monsterScript.LoadMonstersIntoUI();
+            updateAPDisplay();
             LoadHPPlates();
 
             //spawn monsters
@@ -209,7 +210,27 @@ public class combatController : MonoBehaviour {
 
         //MAIN COMBAT FUNCTIONS
 
+        public void TurnQueuer (TurnAction player1Action) {
+            //this gets both moves from each monster and begins the turn
+            //player 2 (CPU) picks a move at random
+            //the following 3 lines are to be replaced whenever we get any netcode
+            List<Move> enemyMoveList = getP2Moves();
+            Move enemyMove = enemyMoveList[UnityEngine.Random.Range(0, enemyMoveList.Count - 1)];
+            TurnAction enemyTurnAction = null;
+
+            if(player2AP >= enemyMove.cost) { 
+                enemyTurnAction = new TurnAction(enemyMove, player2Monster, player1Slot1);
+            } else {
+                enemyTurnAction = new TurnAction(player2Monster);
+            }
+            StartCoroutine(ExecuteTurn(player1Action, enemyTurnAction));
+        }
+
         public IEnumerator ExecuteTurn (TurnAction player1Action, TurnAction player2Action) {
+            
+            GameObject.Find("FightButton").GetComponentInChildren<LoadP1MovesDynamic>().DisableMoveList();
+            GameObject.Find("SwitchButton").GetComponentInChildren<LoadP1MonstersDynamic>().DisableMonsterList();
+
             hasTurnBeenBroken = false;
 
             if (isTurnInProgress) {
@@ -253,6 +274,9 @@ public class combatController : MonoBehaviour {
                         break;
                     case (ActionType.SWITCH):
                         seq.Add (SwapMon (act.user, act.switchMonster));
+                        break;
+                    case (ActionType.REST): 
+                        seq.Add (ChargeAP (act.user));
                         break;
                 }
             }
@@ -408,6 +432,22 @@ public class combatController : MonoBehaviour {
                 cameraController.SetActive (true);
             }
 
+            public IEnumerator ChargeAP (Monster user) { //this is for when you take a charge turn
+                if (user != null) {
+                    if (ReferenceEquals (user, player1Monster)) {
+                        if(player1AP <= 13) player1AP += 3; else player1AP = 16;
+                        WriteToLog ("Player 1 charges AP!");
+                        yield return PlayRestAnimP1();
+                    } else {
+                        if(player2AP <= 13) player2AP += 3; else player2AP = 16;
+                        WriteToLog ("Player 2 charges AP!");
+                        yield return PlayRestAnimP2();
+                    }
+
+                    updateAPDisplay();
+                }
+            }
+
             public IEnumerator SummonNewMon (Monster newMon, int player) //handles sending out a new monster after current mon faints
             {
 
@@ -494,6 +534,7 @@ public class combatController : MonoBehaviour {
                     }
 
                     if (ReferenceEquals (attacker, player1Monster)) {
+                        if(player1AP >= move.cost) player1AP -= move.cost; else player1AP = 0;
                         AtkAnimDel1st = new AtkAnim (PlayAtkAnimP1);
                         FaintAnimDel1st = new FaintAnim (PlayFaintAnimP1);
                         BuffAnimDel1st = new BuffAnim (PlayStatusAnimP1);
@@ -503,7 +544,7 @@ public class combatController : MonoBehaviour {
                         BuffAnimDel2nd = new BuffAnim (PlayStatusAnimP2);
 
                     } else {
-
+                        if(player2AP >= move.cost) player2AP -= move.cost; else player2AP = 0;
                         AtkAnimDel1st = new AtkAnim (PlayAtkAnimP2);
                         FaintAnimDel1st = new FaintAnim (PlayFaintAnimP2);
                         BuffAnimDel1st = new BuffAnim (PlayStatusAnimP2);
@@ -512,6 +553,8 @@ public class combatController : MonoBehaviour {
                         FaintAnimDel2nd = new FaintAnim (PlayFaintAnimP1);
                         BuffAnimDel2nd = new BuffAnim (PlayStatusAnimP1);
                     }
+
+                    updateAPDisplay();
 
                     if (attacker.type1 == move.type || attacker.type2 == move.type) {
                         //is stab
@@ -931,6 +974,28 @@ public class combatController : MonoBehaviour {
                 cameraController.SetActive (true);
             }
 
+             public IEnumerator PlayRestAnimP1 () {
+                cameraController.SetActive (false);
+                P1Cam.SetActive (true);
+                moveNamePlate.GetComponentInChildren<Text> ().text = "Charging";
+                moveNamePlate.SetActive (true);
+                yield return new WaitForSeconds (1.3f);
+                P1Cam.SetActive (false);
+                cameraController.SetActive (true);
+                moveNamePlate.SetActive (false);
+            }
+
+            public IEnumerator PlayRestAnimP2 () {
+                cameraController.SetActive (false);
+                P2Cam.SetActive (true);
+                moveNamePlate.GetComponentInChildren<Text> ().text = "Charging";
+                moveNamePlate.SetActive (true);
+                yield return new WaitForSeconds (1.3f);
+                P2Cam.SetActive (false);
+                cameraController.SetActive (true);
+                moveNamePlate.SetActive (false);
+            }
+
             IEnumerator HPBarDepleteAnim (GameObject img, float targetWidth) {
                 yield return new WaitForSeconds (0.1f);
                 float aux = img.GetComponent<Image> ().rectTransform.localScale.x;
@@ -1023,5 +1088,19 @@ public class combatController : MonoBehaviour {
 
             public List<Monster> getP2Party () {
                 return player2Party;
+            }
+
+            public void spendAP(int player, int cost) {
+                switch(player) {
+                    case 1: player1AP -= cost; break;
+                    case 2: player2AP -= cost; break;
+                }
+                updateAPDisplay();
+            }
+
+            private void updateAPDisplay() {
+                APMeterP1.GetComponentInChildren<Text> ().text = player1AP.ToString();
+                APMeterP2.GetComponentInChildren<Text> ().text = player2AP.ToString();
+                GameObject.Find("FightButton").GetComponentInChildren<LoadP1MovesDynamic>().LoadMovesIntoUI();
             }
         }
